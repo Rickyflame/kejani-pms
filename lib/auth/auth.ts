@@ -16,6 +16,29 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  advanced: {
+    cookiePrefix: "kejani",
+  },
+  session: {
+    cookieCache: {
+      enabled: true,
+    },
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: true,
+        defaultValue: "landlord",
+        input: false, // Not accepted during sign-up; set by default or admin
+      },
+    },
+  },
+  organization: {
+    // Automatically set the active organization to the first one
+    // the user belongs to when they sign in
+    allowUserToCreateOrganization: true,
+  },
 
   plugins: [
     organization({

@@ -28,6 +28,7 @@ export default function SignInPage() {
         setLoading(true);
 
         try {
+            //sign in with email and password
             const { data, error: signInError } = await authClient.signIn.email({
                 email,
                 password,
@@ -41,6 +42,25 @@ export default function SignInPage() {
             if (!data) {
                 toast.error("No response from server.");
                 return;
+            }
+
+            // Fetch the user's organizations and set the first one as active
+            const { data: orgList, error: listError } = await authClient.organization.list();
+
+            if (listError) {
+                toast.error("Signed in, but failed to load organizations.");
+                return;
+            }
+
+            if (orgList && orgList.length > 0) {
+                const { error: setActiveError } = await authClient.organization.setActive({
+                    organizationId: orgList[0].id,
+                });
+
+                if (setActiveError) {
+                    toast.error("Signed in, but failed to set active organization.");
+                    return;
+                }
             }
 
             toast.success("Signed in successfully");

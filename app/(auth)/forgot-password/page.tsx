@@ -37,7 +37,12 @@ export default function ForgotPasswordPage() {
             });
 
             if (!res.ok) {
-                const err = await res.json().catch(() => ({}));
+                const err = await res.json().catch(() => ({ message: "Failed to send reset email" }));
+                // If endpoint is not available (404), show user-friendly message
+                if (res.status === 404) {
+                    toast.error("Password reset is not configured yet. Please contact support.");
+                    return;
+                }
                 toast.error(err.message || "Failed to send reset email.");
                 return;
             }
