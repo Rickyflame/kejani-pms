@@ -66,43 +66,43 @@ export const verification = pgTable("verification", {
 // ── 5. ORGANISATION ─────────────────────────────────────────
 // One row per landlord. This is the multi-tenancy boundary.
 // All business data (properties, leases, payments) is scoped to an organisation.
-export const organisation = pgTable("organisation", {
-    id: text("id").primaryKey(),
-    name: text("name").notNull(),
-    slug: text("slug").unique(),
-    logo: text("logo"),
-    metadata: text("metadata"),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
+export const organization = pgTable("organization", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").unique(),
+  logo: text("logo"),
+  metadata: text("metadata"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 // ── 6. MEMBER ───────────────────────────────────────────────
 // Joins a user to an organisation with a specific role.
 // A landlord is 'owner'; a tenant is 'member'.
 export const member = pgTable("member", {
-    id: text("id").primaryKey(),
-    organisationId: text("organization_id")
-        .notNull()
-        .references(() => organisation.id, { onDelete: "cascade" }),
-    userId: text("user_id")
-        .notNull()
-        .references(() => user.id, { onDelete: "cascade" }),
-    role: text("role").notNull().default("member"),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
+  id: text("id").primaryKey(),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  role: text("role").notNull().default("member"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 // ── 7. INVITATION ───────────────────────────────────────────
 // Pending invitations sent by a landlord to a prospective tenant.
 export const invitation = pgTable("invitation", {
-    id: text("id").primaryKey(),
-    organisationId: text("organization_id")
-        .notNull()
-        .references(() => organisation.id, { onDelete: "cascade" }),
-    email: text("email").notNull(),
-    role: text("role"),
-    status: text("status").notNull().default("pending"),
-    expiresAt: timestamp("expires_at").notNull(),
-    inviterId: text("inviter_id")
-        .notNull()
-        .references(() => user.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
+  id: text("id").primaryKey(),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  email: text("email").notNull(),
+  role: text("role"),
+  status: text("status").notNull().default("pending"),
+  expiresAt: timestamp("expires_at").notNull(),
+  inviterId: text("inviter_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
