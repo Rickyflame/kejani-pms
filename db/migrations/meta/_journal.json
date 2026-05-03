@@ -22,6 +22,13 @@
       "when": 1777781094553,
       "tag": "0002_jittery_shriek",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1777782704060,
+      "tag": "0003_rainy_lake",
+      "breakpoints": true
     }
   ]
 }

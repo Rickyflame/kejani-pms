@@ -146,7 +146,7 @@ export const leaseStatusEnum = pgEnum("lease_status", [
   "terminated",
 ]);
 
-// ──9. Leases ──────────────────────────────────────────────────────────────
+// ── 9. Leases ──────────────────────────────────────────────────────────────
 
 export const leases = pgTable(
   "leases",
@@ -170,4 +170,74 @@ export const leases = pgTable(
     tenantIdx: index("leases_tenant_idx").on(table.tenant_user_id),
     propertyIdx: index("leases_property_idx").on(table.property_id),
   }),
+);
+
+// ── Payment status enum ─────────────────────────────────────────────────
+
+export const paymentStatusEnum = pgEnum('payment_status', [
+  'pending',
+  'paid',
+  'overdue',
+]);
+
+// ── 10. Payments ────────────────────────────────────────────────────────────
+
+export const payments = pgTable(
+  'payments',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    lease_id: uuid('lease_id')
+      .notNull()
+      .references(() => leases.id),
+    tenant_user_id: uuid('tenant_user_id').notNull(),
+    organisation_id: uuid('organisation_id').notNull(),
+    amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
+    due_date: date('due_date').notNull(),
+    paid_date: date('paid_date'),
+    status: paymentStatusEnum('status').notNull().default('pending'),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    orgIdx: index('payments_org_idx').on(table.organisation_id),
+    leaseIdx: index('payments_lease_idx').on(table.lease_id),
+    tenantIdx: index('payments_tenant_idx').on(table.tenant_user_id),
+  })
+);
+
+// ── Maintenance status enum ─────────────────────────────────────────────
+
+export const maintenanceStatusEnum = pgEnum('maintenance_status', [
+  'pending',
+  'in-progress',
+  'resolved',
+]);
+
+// ── 11. Maintenance Requests ────────────────────────────────────────────────
+
+export const maintenanceRequests = pgTable(
+  'maintenance_requests',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    property_id: uuid('property_id')
+      .notNull()
+      .references(() => properties.id),
+    tenant_user_id: uuid('tenant_user_id').notNull(),
+    organisation_id: uuid('organisation_id').notNull(),
+    description: text('description').notNull(),
+    photo_url: text('photo_url'),
+    status: maintenanceStatusEnum('status').notNull().default('pending'),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updated_at: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    orgIdx: index('maintenance_org_idx').on(table.organisation_id),
+    tenantIdx: index('maintenance_tenant_idx').on(table.tenant_user_id),
+    propertyIdx: index('maintenance_property_idx').on(table.property_id),
+  })
 );
