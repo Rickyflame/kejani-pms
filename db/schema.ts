@@ -11,6 +11,7 @@ import {
   date,
   numeric,
   pgEnum,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 // ── 1. USER
@@ -240,4 +241,45 @@ export const maintenanceRequests = pgTable(
     tenantIdx: index('maintenance_tenant_idx').on(table.tenant_user_id),
     propertyIdx: index('maintenance_property_idx').on(table.property_id),
   })
+);
+
+// ── 12. Audit Log ───────────────────────────────────────────────────────────
+
+export const auditLog = pgTable(
+  'audit_log',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    user_id: uuid('user_id').notNull(),
+    org_id: uuid('org_id').notNull(),
+    action: text('action').notNull(), // e.g. 'DELETE', 'UPDATE'
+    table_name: text('table_name').notNull(), // e.g. 'properties'
+    old_data: jsonb('old_data'),
+    new_data: jsonb('new_data'),
+    created_at: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    orgIdx: index('audit_log_org_idx').on(table.org_id),
+    userIdx: index('audit_log_user_idx').on(table.user_id),
+  })
+);
+
+// ── 13. API Metrics ─────────────────────────────────────────────────────────
+
+export const apiMetrics = pgTable(
+  "api_metrics",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    route: text("route").notNull(), //The API endpoint path (e.g., /api/properties).
+    method: text("method").notNull(), //HTTP method: GET, POST, PATCH, DELETE.
+    status_code: integer("status_code").notNull(), //HTTP response status (200, 201, 400, 403, etc.)
+    response_ms: integer("response_ms").notNull(), //Response time in milliseconds
+    created_at: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    routeIdx: index("api_metrics_route_idx").on(table.route),
+  }),
 );
