@@ -15,7 +15,7 @@
     "db:studio:staging": "drizzle-kit studio --config drizzle.staging.config.ts",
     "db:migrate:prod": "drizzle-kit migrate --config drizzle.prod.config.ts",
     "db:studio:prod": "drizzle-kit studio --config drizzle.prod.config.ts",
-    "seed": "tsx scripts/seed.ts"
+    "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
     "better-auth": "^1.6.9",
